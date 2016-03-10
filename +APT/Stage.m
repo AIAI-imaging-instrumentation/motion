@@ -107,7 +107,7 @@ classdef (Abstract) Stage < handle
         dest;
         source;
         channel;
-        timeout;
+        % timeout;
         channelword;
         reverse_message;
         limswitchparams;
@@ -217,7 +217,7 @@ classdef (Abstract) Stage < handle
             obj.dest = obj.CHAR(parser.Results.dest);
             obj.source = obj.CHAR(parser.Results.source);
             obj.channel = obj.CHAR(parser.Results.channel);
-            obj.timeout = obj.CHAR(parser.Results.timeout);
+            timeout = parser.Results.timeout;
             obj.channelword = obj.WORD(parser.Results.channel);
             obj.destdata = obj.CHAR(parser.Results.dest + 128);
             obj.reverse_message = containers.Map('KeyType', 'double', 'ValueType', 'char');
@@ -230,7 +230,7 @@ classdef (Abstract) Stage < handle
                     obj.reverse_message(objkey) = key;
                 end
             end
-            obj.serial = serial(port, 'baudrate', obj.BAUDRATE, 'Timeout', obj.timeout);
+            obj.serial = serial(port, 'baudrate', obj.BAUDRATE, 'Timeout', timeout);
             fopen(obj.serial);
             %obj.serial = fopen(port, 'w+');
         end
@@ -266,6 +266,7 @@ classdef (Abstract) Stage < handle
             parser = inputParser;
             addOptional(parser, 'relative', true);
             addOptional(parser, 'block', true);
+            addOptional(parser, 'timeout', -1);
             parse(parser, varargin{:});
             % dist = obj.LONG(dist / obj.POS_PER_ENC);
             vel = obj.velocity;
@@ -276,13 +277,21 @@ classdef (Abstract) Stage < handle
                     error('move would put stage outside range');
                 end
                 obj.send(obj.MOT_MOVE_RELATIVE, 'data', data);
-                timeout = abs(dist) / vel * 2.0 + 1.0;
+                if parser.Results.timeout == -1
+                    timeout = abs(dist) / vel * 2.0 + 1.0;
+                else
+                    timeout = parser.Results.timeout;
+                end
             else
                 if dist > obj.POSMAX || dist < obj.POSMIN
                     error('move would put stage outside range');
                 end
                 obj.send(obj.MOT_MOVE_ABSOLUTE, 'data', data);
-                timeout = abs(dist - pos) / vel * 1.02 + 1.0;
+                if parser.Results.timeout == -1
+                    timeout = abs(dist - pos) / vel * 1.02 + 1.0;
+                else
+                    timeout = parser.Results.timeout;
+                end
             end
             if parser.Results.block
                 obj.waitmove(timeout)
