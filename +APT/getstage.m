@@ -1,4 +1,4 @@
-function s = getstage(type)
+function s = getstage(type, varargin)
     if strcmp(type, 'rotation')
         target = 'TDC001';
         constructor = @APT.RotationStage;
@@ -17,7 +17,7 @@ function s = getstage(type)
         delete(d);
         clear d;
         if strcmp(target, info.model)
-            s = constructor(port);
+            s = constructor(port, varargin{:});
             return
         end
     end
