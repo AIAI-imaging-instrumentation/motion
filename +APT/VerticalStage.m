@@ -1,21 +1,20 @@
-classdef LinearStage < APT.HomeableStage
+classdef VerticalStage < APT.HomeableStage
 
     properties (Constant = true, Hidden=true)
-        SAMPLING_INTERVAL = 102.4 * 10. ^ -6.
-        POS_PER_ENC = 1.0 / 2000.0
+        SAMPLING_INTERVAL = 65536 * 53.68
+        POS_PER_ENC = 1.0 / 409600.0
         CONTINUOUS = false
     end
     properties (Constant = true)
-        POSMAX = 100
+        POSMAX = 50
         POSMIN = 0
-        VELMAX = 500
+        VELMAX = 3
         VELMIN = 0
     end
 
     methods
-        function obj = LinearStage(port, varargin)
+        function obj = VerticalStage(port, varargin)
             obj@APT.HomeableStage(port, varargin{:})
-            obj.velocity = 10;
         end
     end
 
