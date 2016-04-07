@@ -16,7 +16,7 @@ function s = getstage(type, varargin)
     for i = 1:length(hwinfo.AvailableSerialPorts)
         port = hwinfo.AvailableSerialPorts(i);
         d = APT.DummyStage(port);
-        info = d.hwinfo();
+        info = d.hwinfo()
         delete(d);
         clear d;
         if strcmp(target, info.model)
