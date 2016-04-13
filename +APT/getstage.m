@@ -5,6 +5,9 @@ function s = getstage(type, varargin)
     elseif strcmp(type, 'linear')
         target = 'TBD001';
         constructor = @APT.LinearStage;
+    elseif strcmp(type, 'vertical')
+        target = 'MLJ050';
+        constructor = @APT.VerticalStage;
     else
         error('Unsupported stage type requested. Allowed types are rotation and linear');
     end

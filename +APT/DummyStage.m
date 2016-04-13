@@ -6,6 +6,7 @@ classdef DummyStage < APT.Stage
         MINVEL = 1.0;  % Degrees per sec
         SAMPLING_INTERVAL = 1.0;
         CONTINUOUS = true;
+	ISSTEPPER = true;
     end
 
     methods

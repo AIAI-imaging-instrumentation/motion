@@ -28,3 +28,7 @@ run
 or
 
     s = APT.getstage('linear')
+
+or
+
+    s = APT.getstage('vertical')
