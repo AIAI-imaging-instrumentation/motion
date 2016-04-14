@@ -211,7 +211,7 @@ classdef (Abstract) Stage < handle
             addOptional(parser, 'expected', []);
             parse(parser, varargin{:});
             rawout = fread(obj.serial, 6, 'uchar');
-            hdr = uint8(rawout);
+            hdr = uint8(rawout)
             if hdr(5) > hex2dec('80')
                 datalength = double(typecast(hdr(3:4), 'uint16'));
                 data = uint8(fread(obj.serial, datalength, 'uchar'));
@@ -224,9 +224,11 @@ classdef (Abstract) Stage < handle
                     if msg == obj.HW_RICHRESPONSE
                             me = MException('ThorLabs:HardwareError', sprintf('Expected %s, received %s', ...
                                             obj.reverse_lookup(parser.Results.expected), obj.reverse_lookup(msg)));
-                    else if msg == obj.HW_RESPONSE
+                    elseif msg == obj.HW_RESPONSE
+			    hdr
+			    hdr(3:4)
                             me = MException('Stage:UnexepectedResponse', sprintf('Expected %s, received %s, code %d', ...
-                                            obj.reverse_lookup(parser.Results.expected), obj.reverse_lookup(msg), typecast(hdr(3:4), 'uint16')));
+                                            obj.reverse_lookup(parser.Results.expected), obj.reverse_lookup(msg), hdr(3:4)));
                     else
                             me = MException('Stage:UnexepectedResponse', sprintf('Expected %s, received %s', ...
                                             obj.reverse_lookup(parser.Results.expected), obj.reverse_lookup(msg)));
@@ -261,6 +263,7 @@ classdef (Abstract) Stage < handle
         end
 
     end
+    
     methods
         
         function obj = Stage(port, varargin)
@@ -282,7 +285,7 @@ classdef (Abstract) Stage < handle
             props = obj.constants;
             for keyind = 1:length(props)
                 key = props{keyind};
-	        objkey = obj.(key);
+                objkey = obj.(key);
                 obj.reverse_message(objkey) = key;
             end
             obj.serial = serial(port, 'baudrate', obj.BAUDRATE, 'Timeout', timeout);

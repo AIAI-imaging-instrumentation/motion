@@ -2,7 +2,7 @@ classdef VerticalStage < APT.HomeableStage
 
     properties (Constant = true, Hidden=true)
         SAMPLING_INTERVAL = 65536 * 53.68
-        POS_PER_ENC = 1.0 / 409600.0
+        POS_PER_ENC = 1.0 / 409600.0 / 3.0
         CONTINUOUS = false
     end
     properties (Constant = true)
