@@ -45,6 +45,7 @@ classdef (Abstract) Stage < handle
         MOT_GET_HOMEPARAMS = hex2dec('0442');
         HW_GET_INFO = hex2dec('0006');
         MOT_REQ_STATUSBITS = hex2dec('0429');
+        MOT_GET_STATUSBITS = hex2dec('042A');
         MOT_MOVE_JOG = hex2dec('046A');
         MOT_GET_VELPARAMS = hex2dec('0415');
         MOT_MOVE_VELOCITY = hex2dec('0457');
@@ -102,6 +103,7 @@ classdef (Abstract) Stage < handle
         serial;
         velocity;
         position;
+        enabled;
     end
 
     properties (Access=protected)
@@ -150,6 +152,7 @@ classdef (Abstract) Stage < handle
                      'MOT_GET_HOMEPARAMS', ...
                      'HW_GET_INFO', ...
                      'MOT_REQ_STATUSBITS', ...
+                     'MOT_GET_STATUSBITS', ...
                      'MOT_MOVE_JOG', ...
                      'MOT_GET_VELPARAMS', ...
                      'MOT_MOVE_VELOCITY', ...
@@ -365,15 +368,10 @@ classdef (Abstract) Stage < handle
         end
 
         function info = status(obj)
-	    if obj.ISSTEPPER
-		    error('Not implemented for stepper')
-	    end
-            obj.send(obj.MOT_REQ_DCSTATUSUPDATE, 'param1', obj.CHAR(obj.channel));
-            [~, data] = obj.read('expected', obj.MOT_GET_DCSTATUSUPDATE);
+            obj.send(obj.MOT_REQ_STATUSBITS, 'param1', obj.CHAR(obj.channel));
+            [~, data] = obj.read('expected', obj.MOT_GET_STATUSBITS);
             info = struct;
-            info.pos = typecast(data(3:6), 'int32');
-            info.vel = typecast(data(7:8), 'uint16');
-            status = typecast(data(11:14), 'uint32');
+            status = typecast(data(3:6), 'uint32');
             status_keys = keys(obj.STATUS_MASK);
             info.status = containers.Map('KeyType', 'char', 'ValueType', 'logical');
             for i = 1:length(status_keys)
@@ -387,6 +385,19 @@ classdef (Abstract) Stage < handle
             moving = status('in_motion_homing') || status('in_motion_jogging_forward') || ...
                      status('in_motion_jogging_reverse') || status('in_motion_moving_forward') || ...
                      status('in_motion_moving_reverse');
+        end
+
+        function en = get.enabled(obj)
+            status = obj.status();
+            en = status.status('channel_is_enabled');
+        end
+
+        function set.enabled(obj, en)
+            obj.send(obj.MOD_SET_CHANENABLESTATE, 'param1', obj.channel, 'param2', obj.CHAR(en));
+            pause(0.1);
+            if en ~= obj.enabled
+                error(sprintf('unable to set enabled state to %d', en));
+            end
         end
 
         function vel = get.velocity(obj)
