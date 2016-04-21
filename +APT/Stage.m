@@ -63,6 +63,7 @@ classdef (Abstract) Stage < handle
         MOT_SET_JOGPARAMS = hex2dec('0416');
         MOT_GET_JOGPARAMS = hex2dec('0418');
         MOT_GET_LIMSWITCHPARAMS = hex2dec('0425');
+	HW_NO_FLASH_PROGRAMMING = hex2dec('0018');
         BAUDRATE = 115200
         WORD = @uint16;
         SHORT = @int16;
@@ -170,12 +171,16 @@ classdef (Abstract) Stage < handle
                      'MOT_SET_JOGPARAMS', ...
                      'MOT_GET_JOGPARAMS', ...
                      'MOT_GET_LIMSWITCHPARAMS', ...
+		     'HW_NO_FLASH_PROGRAMMING', ...
                      };
     end
 
     methods(Access=protected)
 
         function name = reverse_lookup(obj, code)
+	    if ~isKey(obj.reverse_message, double(code));
+		    error(sprintf('%f not recogized', double(code)));
+	    end
             name = obj.reverse_message(double(code));
         end
 
@@ -294,7 +299,6 @@ classdef (Abstract) Stage < handle
             end
             obj.serial = serial(port, 'baudrate', obj.BAUDRATE, 'Timeout', timeout);
             fopen(obj.serial);
-            %obj.serial = fopen(port, 'w+');
         end
         
         function delete(obj)
