@@ -337,7 +337,7 @@ classdef (Abstract) Stage < handle
             % dist = obj.LONG(dist / obj.POS_PER_ENC);
             vel = obj.velocity;
             pos = obj.position;
-            data = {obj.channelword, obj.LONG(dist / obj.POS_PER_ENC)};
+            data = {obj.channelword, obj.LONG(dist / double(obj.POS_PER_ENC))};
             if parser.Results.relative
                 if (pos + dist) > obj.POSMAX || (pos + dist) < obj.POSMIN
                     error('move would put stage outside range');
@@ -406,7 +406,7 @@ classdef (Abstract) Stage < handle
 
         function vel = get.velocity(obj)
             s = obj.get_velparams();
-            vel = s.maxvel * obj.POS_PER_ENC / obj.SAMPLING_INTERVAL / 65536;
+            vel = double(s.maxvel) * double(obj.POS_PER_ENC) / double(obj.SAMPLING_INTERVAL) / 65536;
         end
 
         function set.velocity(obj, vel)
@@ -414,14 +414,14 @@ classdef (Abstract) Stage < handle
                 error('invalid velocity')
             end
             info = obj.get_velparams();
-            maxvel = vel / obj.POS_PER_ENC * obj.SAMPLING_INTERVAL * 65536;
+            maxvel = vel / double(obj.POS_PER_ENC) * double(obj.SAMPLING_INTERVAL) * 65536;
             obj.set_velparams(info.minvel, info.acc, maxvel);
         end
 
         function pos = get.position(obj)
             obj.send(obj.MOT_REQ_POSCOUNTER, 'param1', obj.channel);
             [~, data] = obj.read('expected', obj.MOT_GET_POSCOUNTER);
-            pos = typecast(data(3:6), 'int32') * obj.POS_PER_ENC;
+            pos = double(typecast(data(3:6), 'int32')) * double(obj.POS_PER_ENC);
         end
 
         function homed = is_homed(obj)
