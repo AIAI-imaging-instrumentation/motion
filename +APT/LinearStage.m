@@ -4,7 +4,7 @@ classdef LinearStage < APT.HomeableStage
         SAMPLING_INTERVAL = 102.4 * 10. ^ -6.
         POS_PER_ENC = 1.0 / 2000.0
         CONTINUOUS = false
-	ISSTEPPER = false;
+        ISSTEPPER = false;
     end
     properties (Constant = true)
         POSMAX = 100

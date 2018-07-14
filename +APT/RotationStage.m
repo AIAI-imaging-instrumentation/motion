@@ -4,7 +4,7 @@ classdef RotationStage < APT.Stage
         POS_PER_ENC = 360.0 / 12288.0 / 48.0;
         SAMPLING_INTERVAL = 2048.0 / (6.0 * 10.0^6.0);
         CONTINUOUS = true;
-	ISSTEPPER = false;
+        ISSTEPPER = false;
     end
     properties (Constant = true)
         POSMAX = inf
